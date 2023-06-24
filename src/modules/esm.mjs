@@ -2,7 +2,6 @@ import path from 'node:path';
 import { release, version } from 'node:os';
 import { createServer as createServerHttp } from 'node:http';
 import './files/c.js';
-import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,21 +11,20 @@ const random = Math.random();
 
 let unknownObject;
 
-const filePathA = path.join(__dirname, 'files', 'a.json');
-const filePathB = path.join(__dirname, 'files', 'b.json');
+const moduleTypeJSON = {assert: {type: 'json'}};
 
 if (random > 0.5) {
-    unknownObject = await readFile(filePathA, 'utf-8');
+    unknownObject = await import('./files/a.json', moduleTypeJSON);
 } else {
-    unknownObject = await readFile(filePathB, 'utf-8');
+    unknownObject = await import('./files/b.json', moduleTypeJSON);
 }
 
 console.log(`Release ${release()}`);
 console.log(`Version ${version()}`);
 console.log(`Path segment separator is "${path.sep}"`);
 
-console.log(`Path to current file is ${new URL(import.meta.url).pathname}`);
-console.log(`Path to current directory is ${path.dirname(new URL(import.meta.url).pathname)}`);
+console.log(`Path to current file is ${__filename}`);
+console.log(`Path to current directory is ${__dirname}`);
 
 const myServer = createServerHttp((_, res) => {
     res.end('Request accepted');
